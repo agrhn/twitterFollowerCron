@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -39,3 +40,5 @@ try:
     print(response.status_code)
 except Exception as e:
     print(e)
+
+time.sleep(3600)
