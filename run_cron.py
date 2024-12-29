@@ -1,21 +1,26 @@
 import os
 import time
 import requests
-import http.server
-import socketserver
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from socketserver import TCPServer
+from http.server import SimpleHTTPRequestHandler
 
 
-# Add a dummy server to bind to a port
-def start_dummy_server():
-    PORT = 8000
-    Handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        print(f"Serving dummy server on port {PORT}")
-        while True:
-            run()
-            time.sleep(3600)  # Replace with your actual task logic
+# Start a simple HTTP server to keep the Render service alive
+def start_server():
+    PORT = 8080  # Render expects the service to listen on a port (e.g., 8080)
+    with TCPServer(("", PORT), SimpleHTTPRequestHandler) as httpd:
+        print(f"Serving HTTP on port {PORT}...")
+        httpd.serve_forever()
+
+
+# Your cron job logic
+def run_cron_job():
+    while True:
+        print("Running cron job...")
+        run()
+        time.sleep(3600)  # Wait for an hour
 
 
 def run():
@@ -57,6 +62,13 @@ def run():
         print(e)
 
 
-# Call the dummy server
 if __name__ == "__main__":
-    start_dummy_server()
+    from threading import Thread
+
+    # Run the web server in a separate thread
+    server_thread = Thread(target=start_server)
+    server_thread.daemon = True
+    server_thread.start()
+
+    # Run your cron job in the main thread
+    run_cron_job()
