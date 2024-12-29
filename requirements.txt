@@ -1,2 +1,4 @@
 sendgrid
 requests
+http
+socketserver
