@@ -1,26 +1,18 @@
+from flask import Flask, request
+import threading
 import os
-import time
 import requests
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-from socketserver import TCPServer
-from http.server import SimpleHTTPRequestHandler
+
+app = Flask(__name__)
 
 
-# Start a simple HTTP server to keep the Render service alive
-def start_server():
-    PORT = 8080  # Render expects the service to listen on a port (e.g., 8080)
-    with TCPServer(("", PORT), SimpleHTTPRequestHandler) as httpd:
-        print(f"Serving HTTP on port {PORT}...")
-        httpd.serve_forever()
-
-
-# Your cron job logic
-def run_cron_job():
-    while True:
-        print("Running cron job...")
-        run()
-        time.sleep(3600)  # Wait for an hour
+@app.route('/run-job', methods=['POST'])
+def run_job():
+    # Trigger the cron job
+    run()
+    return "Job executed successfully", 200
 
 
 def run():
@@ -60,15 +52,16 @@ def run():
         print(response.status_code)
     except Exception as e:
         print(e)
+        
+
+def start_server():
+    app.run(host="0.0.0.0", port=8080)
 
 
 if __name__ == "__main__":
     from threading import Thread
 
-    # Run the web server in a separate thread
+    # Start Flask server
     server_thread = Thread(target=start_server)
     server_thread.daemon = True
     server_thread.start()
-
-    # Run your cron job in the main thread
-    run_cron_job()
