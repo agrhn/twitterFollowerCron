@@ -7,12 +7,12 @@ from sendgrid.helpers.mail import Mail
 headers = {
     'accept': '*/*',
     'accept-language': 'tr-TR,tr;q=0.9',
-    'authorization': os.environ.ge("authorization"),
+    'authorization': os.environ.get("authorization"),
     'content-type': 'application/json',
     'origin': 'https://x.com',
     'referer': 'https://x.com/',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-    'x-guest-token': os.environ.ge("guest_token")
+    'x-guest-token': os.environ.get("guest_token")
 }
 
 params = {
